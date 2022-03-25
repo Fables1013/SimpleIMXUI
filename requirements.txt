@@ -1,0 +1,4 @@
+PySimpleGui
+Pydantic
+typingx
+BeautifulSoup

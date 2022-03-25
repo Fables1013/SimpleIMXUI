@@ -3,10 +3,8 @@ import PySimpleGUI as sg
 import Configs.GlobalConfigs
 import GlobalVariables
 from Configs.Gui_Configs import windowSize
-from GlobalVariables import searchMatches
 from GuiController import tableFromMatchingOrders, resetMatchingOrdersTable, handleSelectedImg, \
     handleRadioButtonChange, handleSearch, handlePurchaseButton
-
 
 '''
 This GUI is a simple UI used to enable users to find and purchase Gods Unchained cards w/o needing to pay a marketplace 
@@ -18,91 +16,92 @@ and then the right side shows listings available for purchase.
 '''
 
 
-search_column = [
-    [
-        sg.Text("Card Name"),
-        sg.In(size=(25, 1), enable_events=True, key="-CARDNAME-"),
-        sg.Button("Search", key="-SEARCHBUTTON-")
-    ],
-    [
-        sg.Image(enable_events=True, key="-CARD IMAGE 1-"),
-        sg.Image(enable_events=True, key="-CARD IMAGE 2-")
-    ],
-    [
-        sg.Image(enable_events=True, key="-CARD IMAGE 3-"),
-        sg.Image(enable_events=True, key="-CARD IMAGE 4-")
-    ],
-    [
-        sg.Image(enable_events=True, key="-CARD IMAGE 5-"),
-        sg.Image(enable_events=True, key="-CARD IMAGE 6-")
+def run_application():
+    search_column = [
+        [
+            sg.Text("Card Name"),
+            sg.In(size=(25, 1), enable_events=True, key="-CARDNAME-"),
+            sg.Button("Search", key="-SEARCHBUTTON-")
+        ],
+        [
+            sg.Image(enable_events=True, key="-CARD IMAGE 1-"),
+            sg.Image(enable_events=True, key="-CARD IMAGE 2-")
+        ],
+        [
+            sg.Image(enable_events=True, key="-CARD IMAGE 3-"),
+            sg.Image(enable_events=True, key="-CARD IMAGE 4-")
+        ],
+        [
+            sg.Image(enable_events=True, key="-CARD IMAGE 5-"),
+            sg.Image(enable_events=True, key="-CARD IMAGE 6-")
+        ]
     ]
-]
 
-card_purchase_column = [
-    [sg.Text(Configs.GlobalConfigs.defaultChooseCardText, key="Choose Card Text")],
-    [
-        sg.Radio('Meteorite', 'Quality', enable_events=True, key='-QualityRadio4-', default=True),
-        sg.Radio('Shadow', 'Quality', enable_events=True, key='-QualityRadio3-', default=False),
-        sg.Radio('Gold', 'Quality', enable_events=True, key='-QualityRadio2-', default=False),
-        sg.Radio('Diamond', 'Quality', enable_events=True, key='-QualityRadio1-', default=False)
-    ],
-    [sg.Table(values=tableFromMatchingOrders(), headings=['PX', 'Currency', 'PX USD'],
-              auto_size_columns=False,
-              justification='right',
-              num_rows=20,
-              def_col_width=10,
-              col_widths=[15, 15, 15],
-              key='-TABLE-',
-              row_height=10,
-              enable_events=True,
-              select_mode=sg.TABLE_SELECT_MODE_BROWSE)],
-    [sg.Button('Purchase', key='PURCHASE-BUTTON', disabled=True)]
+    card_purchase_column = [
+        [sg.Text(Configs.GlobalConfigs.defaultChooseCardText, key="Choose Card Text")],
+        [
+            sg.Radio('Meteorite', 'Quality', enable_events=True, key='-QualityRadio4-', default=True),
+            sg.Radio('Shadow', 'Quality', enable_events=True, key='-QualityRadio3-', default=False),
+            sg.Radio('Gold', 'Quality', enable_events=True, key='-QualityRadio2-', default=False),
+            sg.Radio('Diamond', 'Quality', enable_events=True, key='-QualityRadio1-', default=False)
+        ],
+        [sg.Table(values=tableFromMatchingOrders(), headings=['PX', 'Currency', 'PX USD'],
+                  auto_size_columns=False,
+                  justification='right',
+                  num_rows=20,
+                  def_col_width=10,
+                  col_widths=[15, 15, 15],
+                  key='-TABLE-',
+                  row_height=10,
+                  enable_events=True,
+                  select_mode=sg.TABLE_SELECT_MODE_BROWSE)],
+        [sg.Button('Purchase', key='PURCHASE-BUTTON', disabled=True)]
 
-]
-
-# ----- Full layout -----
-layout = [
-    [
-        sg.Column(search_column),
-        sg.VSeperator(),
-        sg.Column(card_purchase_column)
     ]
-]
 
-GlobalVariables.window = sg.Window("Gods Unchained", layout, size=windowSize)
+    # ----- Full layout -----
+    layout = [
+        [
+            sg.Column(search_column),
+            sg.VSeperator(),
+            sg.Column(card_purchase_column)
+        ]
+    ]
 
-# Run the Event Loop
-while True:
-    event, values = GlobalVariables.window.read()
-    if event == "Exit" or event == sg.WIN_CLOSED:
-        break
+    GlobalVariables.window = sg.Window("Gods Unchained", layout, size=windowSize)
 
-    if event == "-SEARCHBUTTON-":
-        resetMatchingOrdersTable()
-        searchStr = values["-CARDNAME-"]
-        handleSearch(searchStr)
+    # Run the Event Loop
+    while True:
+        event, values = GlobalVariables.window.read()
+        if event == "Exit" or event == sg.WIN_CLOSED:
+            break
 
-    elif "-CARD IMAGE" in event:
-        ind = int(event[-2]) - 1
-        if ind >= len(GlobalVariables.searchMatches):
-            continue
-        GlobalVariables.selectedAsset = GlobalVariables.searchMatches[ind]
-        GlobalVariables.window["Choose Card Text"].update(GlobalVariables.selectedAsset.name)
-        handleSelectedImg()
+        if event == "-SEARCHBUTTON-":
+            resetMatchingOrdersTable()
+            searchStr = values["-CARDNAME-"]
+            handleSearch(searchStr)
 
-    elif "Quality" in event:
-        qNum = int(event[-2])
-        if qNum != GlobalVariables.selectedQuality:
-            GlobalVariables.selectedQuality = qNum
-            handleRadioButtonChange()
+        elif "-CARD IMAGE" in event:
+            ind = int(event[-2]) - 1
+            if ind >= len(GlobalVariables.searchMatches):
+                continue
+            GlobalVariables.selectedAsset = GlobalVariables.searchMatches[ind]
+            GlobalVariables.window["Choose Card Text"].update(GlobalVariables.selectedAsset.name)
+            handleSelectedImg()
 
-    elif "PURCHASE-BUTTON" == event:
-        handlePurchaseButton()
-        handleSelectedImg()
+        elif "Quality" in event:
+            qNum = int(event[-2])
+            if qNum != GlobalVariables.selectedQuality:
+                GlobalVariables.selectedQuality = qNum
+                handleRadioButtonChange()
 
-    elif "-TABLE-" in event:
-        if len(values["-TABLE-"]) != 0:
-            GlobalVariables.selectedOrder = GlobalVariables.matchingOrders[values['-TABLE-'][0]]
-            GlobalVariables.window["PURCHASE-BUTTON"].update(disabled=False)
+        elif "PURCHASE-BUTTON" == event:
+            handlePurchaseButton()
+            handleSelectedImg()
 
-GlobalVariables.window.close()
+        elif "-TABLE-" in event:
+            if len(values["-TABLE-"]) != 0:
+                GlobalVariables.selectedOrder = GlobalVariables.matchingOrders[values['-TABLE-'][0]]
+                GlobalVariables.window["PURCHASE-BUTTON"].update(disabled=False)
+
+    GlobalVariables.window.close()

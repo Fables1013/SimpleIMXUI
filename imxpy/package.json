@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@imtbl/imx-sdk": "^1.3.17"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.4"
+  }
+}
